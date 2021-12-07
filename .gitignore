@@ -1,0 +1,4 @@
+build
+dist
+findrep.spec
+src/__pycache__

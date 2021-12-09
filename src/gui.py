@@ -1,57 +1,46 @@
 import tkinter as tk
 
 
-class FindRepGUI:
-    def __init__(self, width, height, font, bg, fg):
-        self.__bg = bg
-        self.__fg = fg
-        self.__font = font
+class GUI:
+    bg = "#111"
+    fg = "#eee"
+    font = ("Cooper", 12)
+    window = tk.Tk()
+    window.geometry("340x420")
+    window.resizable(0, 0)
+    window.title("findREp")
+    window.configure(bg=bg)
 
-        self.window = tk.Tk()
-        self.window.configure(bg=bg)
-        self.window.geometry(f"{width}x{height}")
+    @staticmethod
+    def new_button(text, master=None, **config_args):
+        if master == None:
+            master = GUI.window
 
-    def new_button(self, master, text, width=None, bg=None, fg=None, command=None):
-        btn = tk.Button(
-            master, text=text, bd=0, font=self.__font,
-            highlightthickness=0, command=command
+        return tk.Button(
+            master, text=text, bd=0, font=GUI.font, highlightthickness=0,
+            **config_args
         )
 
-        if width != None:
-            btn.configure(width=width)
+    def new_entry(master=None, **config_args):
+        if master == None:
+            master = GUI.window
 
-        if bg != None:
-            btn.configure(bg=bg)
+        return tk.Entry(master, bd=0, font=GUI.font, **config_args)
 
-        if fg != None:
-            btn.configure(fg=fg)
+    def new_label(text, master=None, **config_args):
+        if master == None:
+            master = GUI.window
 
-        return btn
+        if "bg" not in config_args:
+            config_args["bg"] = GUI.bg
 
-    def new_entry(self, master, width=None):
-        entry = tk.Entry(master, bd=0, font=self.__font)
+        if "fg" not in config_args:
+            config_args["fg"] = GUI.fg
 
-        if width != None:
-            entry.configure(width=width)
+        return tk.Label(master, text=text, font=GUI.font, **config_args)
 
-        return entry
+    def new_text(master=None, **config_args):
+        if master == None:
+            master = GUI.window
 
-    def new_label(self, master, text, bg=None, fg=None, **kwargs):
-        if bg == None:
-            bg = self.__bg
-
-        if fg == None:
-            fg = self.__fg
-
-        return tk.Label(master, text=text, bg=bg, fg=fg, font=self.__font, **kwargs)
-
-    def new_text(self, master, width=None, height=None):
-        text = tk.Text(master, bd=0, font=self.__font)
-
-        if width != None:
-            text.configure(width=width)
-
-        if height != None:
-            text.configure(height=height)
-
-        return text
+        return tk.Text(master, bd=0, font=GUI.font, **config_args)

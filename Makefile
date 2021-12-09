@@ -14,4 +14,4 @@ dist/$(BIN): $(SRC_FILES)
 	pyinstaller -F -n $(BIN) $(ENTRY)
 
 clean:
-	rm -fr build dist
+	rm -fr build dist $(BIN).spec

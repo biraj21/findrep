@@ -1,28 +1,30 @@
-import mimetypes
 import os
 import re
-
-import utils
-
-OUTPUT_DIR = "findreped"
 
 __regex = None
 __replacement = None
 
 
-def __findrep(ifilename, ofilename):
-    filetype = mimetypes.guess_type(ifilename)[0]
-    if filetype == None or "text" not in filetype:
+def __findrep(filename, backup_path):
+    try:
+        with open(filename, "r") as file:
+            content = file.read()
+    except:
         return
 
-    with open(ifilename, "r") as file, open(ofilename, "w") as new_file:
-        content = file.read()
-        new_file.write(re.sub(__regex, __replacement, content))
+    new_content, nchanges = re.subn(__regex, __replacement, content)
+    if nchanges == 0:
+        return
+
+    os.makedirs(backup_path, exist_ok=True)
+    os.rename(filename, os.path.join(backup_path, os.path.basename(filename)))
+    with open(filename, "w") as file:
+        file.write(new_content)
 
 
 def findrep_files(filenames, regex, replacement):
     if regex == "":
-        raise Exception("regex is required")
+        raise Exception("regex (find) is required")
 
     global __regex
     global __replacement
@@ -31,29 +33,28 @@ def findrep_files(filenames, regex, replacement):
     __replacement = replacement
 
     for filename in filenames:
-        __findrep(filename, f"{OUTPUT_DIR}/{os.path.basename(filename)}")
+        backup_path = os.path.join(
+            os.path.dirname(filename), "original_files"
+        )
+
+        __findrep(filename, backup_path)
 
 
-def __process_recursive(input_path, output_path):
+def __process__directory(input_path, backup_path):
     with os.scandir(input_path) as entries:
         for entry in entries:
             if entry.is_dir():
-                __process_recursive(
+                __process__directory(
                     f"{input_path}/{entry.name}",
-                    f"{output_path}/{entry.name}",
+                    f"{backup_path}/{entry.name}"
                 )
             else:
-                utils.make_dir(output_path)
-
-                __findrep(
-                    f"{input_path}/{entry.name}",
-                    f"{output_path}/{entry.name}",
-                )
+                __findrep(f"{input_path}/{entry.name}", backup_path)
 
 
 def findrep_directory(directory, regex, replacement):
     if regex == "":
-        raise Exception("regex is required")
+        raise Exception("regex (find) is required")
 
     global __regex
     global __replacement
@@ -61,6 +62,9 @@ def findrep_directory(directory, regex, replacement):
     __regex = regex
     __replacement = replacement
 
-    __process_recursive(
-        directory, f"{OUTPUT_DIR}/{os.path.basename(directory)}"
+    backup_path = os.path.join(
+        os.path.dirname(directory),
+        f"{os.path.basename(directory)}_original"
     )
+
+    __process__directory(directory, backup_path)

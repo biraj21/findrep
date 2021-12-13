@@ -13,8 +13,7 @@ GUI.new_button(
 ).pack(side=tk.LEFT)
 
 GUI.new_button(
-    "Folder", height=2, master=sframe, width=11,
-    command=lambda: get_dirname(slabel)
+    "Folder", master=sframe, width=11, command=lambda: get_dirname(slabel)
 ).pack(side=tk.RIGHT)
 
 slabel = GUI.new_label("No files or folder selected")
